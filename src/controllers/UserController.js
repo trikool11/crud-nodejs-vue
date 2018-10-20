@@ -2,7 +2,7 @@ const UserModel = require('../models/UserModel')
 
 module.exports = {
     users: (req, res, next) => {
-        UserModel.findAll().then(result => {
+        UserModel.findAll({ where: { state: '1' }}).then(result => {
             res.json(result)
         }).catch(err => {
             res.status(500).json({
