@@ -33,9 +33,14 @@
                                                     <v-btn flat icon color="pink darken-4" @click="viewInformation(user)">
                                                         <v-icon>remove_red_eye</v-icon>
                                                     </v-btn>
-                                                </v-flex>                                               
+                                                </v-flex>     
                                                 <v-flex xs12 sm4 md4>
-                                                    <v-switch v-model="user.user" color="success" hide-details></v-switch>
+                                                    <v-btn flat icon color="pink darken-4" @click="removeUser(user.id)">
+                                                        <v-icon>delete</v-icon>
+                                                    </v-btn>
+                                                </v-flex>                                            
+                                                <v-flex xs12 sm4 md4>
+                                                    <v-switch v-model="switchstate" color="success" hide-details @click="changeStateUser()"></v-switch>
                                                 </v-flex>
                                             </v-layout>                                            
                                         </v-list-tile-action>
@@ -55,24 +60,24 @@
                 <v-container fluid pt-0>
                     <v-layout row wrap>
                         <v-flex xs12 sm6 md6 pa-1>
-                            <v-text-field name="name" label="Name" solo :value="user.name"></v-text-field>
+                            <v-text-field name="name" label="Name" solo v-model="user.name"></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm6 md6 pa-1>
-                            <v-text-field name="last name" label="Last name" solo :value="user.last_name"></v-text-field>
+                            <v-text-field name="last name" label="Last name" solo v-model="user.last_name"></v-text-field>
                         </v-flex>
                     </v-layout>
                     <v-layout row wrap>
                         <v-flex xs12 sm6 md6 pa-1>
-                            <v-text-field name="user" label="User" solo :value="user.user"></v-text-field>
+                            <v-text-field name="user" label="User" solo v-model="user.user"></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm6 md6 pa-1>
-                            <v-text-field name="password" label="Password" solo :value="user.password"></v-text-field>
+                            <v-text-field name="password" label="Password" solo v-model="user.password"></v-text-field>
                         </v-flex>
                     </v-layout>
                 </v-container>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" class="white--text" @click="actualizar()"> Guardar </v-btn>
+                    <v-btn color="green darken-1" class="white--text" @click="updateuser()"> Guardar </v-btn>
                     <v-btn color="primary" class="white--text" @click="cerrarCancelar()"> Cerrar/Cancelar </v-btn>
                 </v-card-actions>
             </v-card>
@@ -86,6 +91,7 @@
             return {
                 users: [],
                 user: {},
+                switchstate: false,
                 selected: [],
                 loading: true,
                 dialog: false,
@@ -120,11 +126,28 @@
                 this.user = user
                 this.dialog = true
             },
-            actualizar() {
+            updateuser() {
                 let user = this.user
-                //this.$http.post()
+                this.$http.post('/api/users/updateuser', user).then((result) => {
+                    this.dialog = false     
+                    setTimeout(() => {
+                        this.user = {}
+                    }, 300);             
+                }).catch((err) => {
+                    console.log(err)                    
+                })
             },
-
+            removeUser(id) {
+                this.$http.post('/api/users/deleteuser', { id: id }).then((result) => {
+                    this.listusers()
+                }).catch((err) => {
+                    console.log(err)                    
+                });
+            },
+            changeStateUser(event) {
+                console.log(event);
+                
+            },
             cerrarCancelar() {
                 this.dialog = false
                 setTimeout(() => {
